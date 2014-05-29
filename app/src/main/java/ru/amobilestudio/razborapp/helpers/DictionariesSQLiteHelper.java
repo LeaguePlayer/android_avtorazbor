@@ -8,10 +8,14 @@ import android.provider.BaseColumns;
 
 import java.util.ArrayList;
 
+import ru.amobilestudio.razborapp.app.R;
+
 /**
  * Created by vetal on 21.05.14.
  */
 public class DictionariesSQLiteHelper extends SQLiteOpenHelper {
+
+    private Context _context;
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "Dictionaries.db";
@@ -38,6 +42,7 @@ public class DictionariesSQLiteHelper extends SQLiteOpenHelper {
 
     public DictionariesSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        _context = context;
     }
 
     @Override
@@ -70,13 +75,15 @@ public class DictionariesSQLiteHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public ArrayList<Item> getAll(String tableName){
+    public ArrayList<Item> getAll(String tableName, boolean withEmpty){
         ArrayList<Item> items = new ArrayList<Item>();
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor c = db.rawQuery("SELECT * FROM " + tableName, null);
 
         if(c.moveToFirst()){
+            if(withEmpty)
+                items.add(new Item(0, _context.getString(R.string.empty_item)));
             while (!c.isAfterLast()){
                 Item item = new Item(
                         c.getInt(c.getColumnIndex(COLUMN_ID_VALUE)),
@@ -87,6 +94,37 @@ public class DictionariesSQLiteHelper extends SQLiteOpenHelper {
             }
         }
         return items;
+    }
+
+    public int getPositionById(int id, String tableName){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor c = db.rawQuery("SELECT * FROM " + tableName, null);
+
+        int position = -1;
+        if(c.moveToFirst())
+            while(!c.isAfterLast()){
+                if(c.getInt(c.getColumnIndex(COLUMN_ID_VALUE)) == id){
+                    position = c.getPosition();
+                    break;
+                }
+                c.moveToNext();
+            }
+
+        return position;
+    }
+
+    public int getIdByValue(String name, String tableName){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor c = db.query(tableName, new String[] {COLUMN_ID_VALUE}, COLUMN_NAME_VALUE + "=?",
+                new String[] { name}, null, null, null, null);
+
+        int result = 0;
+        if(c.moveToFirst())
+            result = c.getInt(c.getColumnIndex(COLUMN_ID_VALUE));
+
+        return result;
     }
 
     public static final class Item{

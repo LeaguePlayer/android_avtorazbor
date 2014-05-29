@@ -1,6 +1,7 @@
 package ru.amobilestudio.razborapp.app;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.amobilestudio.razborapp.helpers.Connection;
+import ru.amobilestudio.razborapp.helpers.DataFieldsAsync;
 
 
 public class LoginActivity extends ActionBarActivity implements View.OnClickListener {
@@ -45,6 +47,17 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //check connection
+        if(Connection.checkNetworkConnection(this)){
+
+            //create database with data for select inputs
+            SharedPreferences db_info = getSharedPreferences(DataFieldsAsync.DB_PREFS, Context.MODE_PRIVATE);
+            if(!db_info.getBoolean("isDb", false)){
+                DataFieldsAsync dataFieldsAsync = new DataFieldsAsync(this);
+                dataFieldsAsync.execute();
+            }
+        }
 
         if(LoginActivity.isLogin(this)){
             Intent intent = new Intent(this, MainActivity.class);
@@ -122,8 +135,6 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                 SendPostAsyncTask task = new SendPostAsyncTask(this);
                 task.execute(login, pass);
             }
-            /*Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);*/
         }else{
             new AlertDialog.Builder(this)
                     .setTitle("Error")
@@ -151,9 +162,23 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         private Integer user_id = null;
         private String user_fio;
 
+        private ProgressDialog _progress;
+
         public SendPostAsyncTask(Context context){
             this.context = context;
             this.errors = new ArrayList<String>();
+
+            _progress = new ProgressDialog(context);
+            _progress.setTitle(context.getString(R.string.wait_title));
+            _progress.setMessage(context.getString(R.string.login_title));
+            _progress.setCancelable(true);
+            _progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            _progress.show();
         }
 
         @Override
@@ -226,6 +251,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            _progress.dismiss();
 
             if(this.errors.isEmpty()){
 

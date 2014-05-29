@@ -1,6 +1,13 @@
 apply plugin: 'android'
 
 android {
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
     compileSdkVersion 19
     buildToolsVersion "19.0.3"
 
@@ -26,4 +33,7 @@ dependencies {
     // You must install or update the Google Repository through the SDK manager to use this dependency.
     compile 'com.android.support:appcompat-v7:19.+'
     compile 'com.google.android.gms:play-services:4.2.42'
+    compile files('libs/httpclient-4.3.3.jar')
+    compile files('libs/httpmime-4.3.3.jar')
+    compile files('libs/httpcore-4.3.2.jar')
 }

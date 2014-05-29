@@ -1,26 +1,37 @@
 package ru.amobilestudio.razborapp.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-import ru.amobilestudio.razborapp.custom.MyAutoComplete;
 import ru.amobilestudio.razborapp.helpers.Connection;
 import ru.amobilestudio.razborapp.helpers.CreatePartAsync;
 import ru.amobilestudio.razborapp.helpers.DataFieldsAsync;
 import ru.amobilestudio.razborapp.helpers.DictionariesSQLiteHelper;
+import ru.amobilestudio.razborapp.helpers.Part;
+import ru.amobilestudio.razborapp.helpers.SendImageAsync;
 import ru.amobilestudio.razborapp.helpers.SendPartAsync;
 
 
@@ -30,11 +41,14 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
     public static EditText _partsPriceBuy;
     public static EditText _partsComment;
 
-    public static MyAutoComplete _partsCategoryId;
-    public static MyAutoComplete _partsCarModelId;
-    public static MyAutoComplete _partsLocationId;
-    public static MyAutoComplete _partsSupplierId;
-    public static MyAutoComplete _partsBuId;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+//    public static MyAutoComplete _partsCategoryId;
+    public static Spinner _partsCategoryId;
+    public static Spinner _partsCarModelId;
+    public static Spinner _partsLocationId;
+    public static Spinner _partsSupplierId;
+    public static Spinner _partsBuId;
 
     //for POST send
     public static int _categoryId;
@@ -44,6 +58,7 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
     public static int _buId;
 
     private static Button _sendButton;
+    private static Button _takePhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,107 +70,151 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
         _partsPriceBuy = (EditText) findViewById(R.id.parts_price_buy);
         _partsComment = (EditText) findViewById(R.id.parts_comment);
 
-        _partsCategoryId = (MyAutoComplete) findViewById(R.id.parts_category_id);
-        _partsCarModelId = (MyAutoComplete) findViewById(R.id.parts_car_model_id);
-        _partsLocationId = (MyAutoComplete) findViewById(R.id.parts_location_id);
-        _partsSupplierId = (MyAutoComplete) findViewById(R.id.parts_supplier_id);
-        _partsBuId = (MyAutoComplete) findViewById(R.id.parts_bu_id);
+        _partsCategoryId = (Spinner) findViewById(R.id.parts_category_id);
+        _partsCarModelId = (Spinner) findViewById(R.id.parts_car_model_id);
+        _partsLocationId = (Spinner) findViewById(R.id.parts_location_id);
+        _partsSupplierId = (Spinner) findViewById(R.id.parts_supplier_id);
+        _partsBuId = (Spinner) findViewById(R.id.parts_bu_id);
 
         _sendButton = (Button) findViewById(R.id.save_part_button);
         _sendButton.setOnClickListener(this);
 
+        _takePhoto = (Button) findViewById(R.id.take_photo);
+        _takePhoto.setOnClickListener(this);
 
+        setSelectsField(this);
 
-        //check connection
-        if(Connection.checkNetworkConnection(this)){
+        //when click on item ListView
+        Bundle extras = getIntent().getExtras();
 
-            //when click on item ListView
-            Bundle extras = getIntent().getExtras();
-
-            if(extras == null){
-                //create part
+        if(extras == null){
+            //check connection
+            if(Connection.checkNetworkConnection(this)){
                 CreatePartAsync createPartAsync = new CreatePartAsync(this);
                 createPartAsync.execute();
-            }else{
-                int clicked_part_id = extras.getInt("part_id");
             }
+        }else{
+            Part part = (Part) getIntent().getSerializableExtra("Part");
 
-            setSelectsField(this);
+            SharedPreferences part_info = getSharedPreferences(DataFieldsAsync.DB_PREFS, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = part_info.edit();
+
+            editor.putInt("part_id", part.get_id());
+            editor.commit();
+
+            setPartForm(part);
         }
+    }
+
+    private void setPartForm(Part part){
+        TextView tv = (TextView) findViewById(R.id.article_part);
+
+        String text = tv.getText().toString();
+        tv.setText(text + " " + part.get_id());
+
+        ProgressBar loader = (ProgressBar) findViewById(R.id.loader);
+        loader.setVisibility(View.GONE);
+
+        //format for price
+        DecimalFormat df = new DecimalFormat("#");
+
+        String value = (part != null) ? df.format(part.getPrice_sell()) : "";
+        _partsPriceSell.setText(value);
+
+        value = (part != null) ? df.format(part.getPrice_buy()) : "";
+        _partsPriceBuy.setText(value);
+
+        _partsComment.setText(part.getComment());
+
+        //selects
+        final DictionariesSQLiteHelper dictionariesSQLiteHelper = new DictionariesSQLiteHelper(this);
+        int position = dictionariesSQLiteHelper.getPositionById(part.getCategory_id(), DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES);
+        _partsCategoryId.setSelection(position);
+
+        position = dictionariesSQLiteHelper.getPositionById(part.getCar_model_id(), DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS);
+        _partsCarModelId.setSelection(position);
+
+        position = dictionariesSQLiteHelper.getPositionById(part.getLocation_id(), DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS);
+        _partsLocationId.setSelection(position + 1);
+
+        position = dictionariesSQLiteHelper.getPositionById(part.getSupplier_id(), DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS);
+        _partsSupplierId.setSelection(position + 1);
+
+        position = dictionariesSQLiteHelper.getPositionById(part.getUsed_car_id(), DictionariesSQLiteHelper.TABLE_NAME_BU_CARS);
+        _partsBuId.setSelection(position + 1);
     }
 
     public static void setSelectsField(final Context context){
         DictionariesSQLiteHelper dsh = new DictionariesSQLiteHelper(context);
 
+        AdapterView.OnItemSelectedListener selectedListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                DictionariesSQLiteHelper.Item item = (DictionariesSQLiteHelper.Item) adapterView.getItemAtPosition(i);
+                switch (adapterView.getId()){
+                    case R.id.parts_category_id:
+                        _categoryId = item.getId();
+                        break;
+                    case R.id.parts_car_model_id:
+                        _carModelId = item.getId();
+                        break;
+                    case R.id.parts_location_id:
+                        _locationId = item.getId();
+                        break;
+                    case R.id.parts_supplier_id:
+                        _supplierId = item.getId();
+                        break;
+                    case R.id.parts_bu_id:
+                        _buId = item.getId();
+                        break;
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        };
+
         //categories
-        ArrayList<DictionariesSQLiteHelper.Item> list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES);
+        ArrayList<DictionariesSQLiteHelper.Item> list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES, false);
         ItemAdapter adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _partsCategoryId.setAdapter(adapter);
-        _partsCategoryId.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                DictionariesSQLiteHelper.Item item = (DictionariesSQLiteHelper.Item) adapterView.getItemAtPosition(i);
-                _categoryId = item.getId();
-            }
-        });
+        _partsCategoryId.setOnItemSelectedListener(selectedListener);
 
         //car models
-        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS);
+        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS, false);
         adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _partsCarModelId.setAdapter(adapter);
-        _partsCarModelId.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                DictionariesSQLiteHelper.Item item = (DictionariesSQLiteHelper.Item) adapterView.getItemAtPosition(i);
-                _carModelId = item.getId();
-            }
-        });
+        _partsCarModelId.setOnItemSelectedListener(selectedListener);
 
         //locations
-        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS);
+        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS, true);
         adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _partsLocationId.setAdapter(adapter);
-        _partsLocationId.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                DictionariesSQLiteHelper.Item item = (DictionariesSQLiteHelper.Item) adapterView.getItemAtPosition(i);
-                _locationId = item.getId();
-            }
-        });
+        _partsLocationId.setOnItemSelectedListener(selectedListener);
 
         //suppliers
-        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS);
+        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS, true);
         adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _partsSupplierId.setAdapter(adapter);
-        _partsSupplierId.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                DictionariesSQLiteHelper.Item item = (DictionariesSQLiteHelper.Item) adapterView.getItemAtPosition(i);
-                _supplierId = item.getId();
-            }
-        });
+        _partsSupplierId.setOnItemSelectedListener(selectedListener);
 
         //bu
-        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_BU_CARS);
+        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_BU_CARS, true);
         adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _partsBuId.setAdapter(adapter);
-        _partsBuId.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                DictionariesSQLiteHelper.Item item = (DictionariesSQLiteHelper.Item) adapterView.getItemAtPosition(i);
-                _buId = item.getId();
-            }
-        });
+        _partsBuId.setOnItemSelectedListener(selectedListener);
+
     }
 
 
@@ -180,11 +239,17 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
+
         switch (view.getId()){
+
             case R.id.save_part_button:
                 sendPart();
                 break;
+            case R.id.take_photo:
+                takePhoto();
+                break;
         }
+
     }
 
     private void sendPart(){
@@ -192,11 +257,67 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
         SharedPreferences part_info = getSharedPreferences(DataFieldsAsync.DB_PREFS, Context.MODE_PRIVATE);
         int id = part_info.getInt("part_id", 0);
 
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            Part part = (Part) getIntent().getSerializableExtra("Part");
+            id = part.get_id();
+        }
+
         if(id != 0 && Connection.checkNetworkConnection(this)){
             SendPartAsync sendTask = new SendPartAsync(this);
             sendTask.execute(id);
         }
     }
+
+    String mCurrentPhotoPath;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void takePhoto(){
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {}
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            File file = new File(mCurrentPhotoPath);
+
+            if(file.exists()){
+                SendImageAsync sendImageAsync = new SendImageAsync(this);
+                sendImageAsync.execute(file);
+            }
+
+        }
+    }
+
 
     public static class ItemAdapter extends ArrayAdapter<DictionariesSQLiteHelper.Item>{
 
@@ -224,20 +345,5 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
             return _items.get(position).getId();
         }
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView label = new TextView(_context);
-            label.setText(_items.get(position).getValue());
-
-            return label;
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            TextView label = new TextView(_context);
-            label.setText(_items.get(position).getValue());
-
-            return label;
-        }
     }
 }

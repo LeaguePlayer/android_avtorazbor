@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import ru.amobilestudio.razborapp.app.AddPartActivity;
 import ru.amobilestudio.razborapp.app.MainActivity;
+import ru.amobilestudio.razborapp.app.R;
 
 /**
  * Created by vetal on 20.05.14.
@@ -32,11 +32,12 @@ public class DataFieldsAsync extends AsyncTask<Void, Integer, Void> {
     public static final String DB_PREFS = "DbPrefsFile";
 
     public DataFieldsAsync(Context context) {
+
         _context = context;
         _progress = new ProgressDialog(context);
-        _progress.setTitle("Загружаем данные.");
-        _progress.setMessage("Подождите.");
-        _progress.setCancelable(true);
+        _progress.setTitle(context.getString(R.string.wait_title));
+        _progress.setMessage(context.getString(R.string.load_message));
+        _progress.setCancelable(false);
         _progress.setProgress(0);
         _progress.setMax(100);
         _progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -48,7 +49,6 @@ public class DataFieldsAsync extends AsyncTask<Void, Integer, Void> {
         super.onPreExecute();
         _progress.show();
 
-        Log.d(MainActivity.TAG, "onPreExecute");
     }
 
     @Override
@@ -104,9 +104,6 @@ public class DataFieldsAsync extends AsyncTask<Void, Integer, Void> {
             e.printStackTrace();
         }
 
-
-        //this.errors = JSON.getErrorsFromJSON(inputStream);
-
         return null;
     }
 
@@ -114,8 +111,6 @@ public class DataFieldsAsync extends AsyncTask<Void, Integer, Void> {
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
         _progress.setProgress(values[0]);
-        Log.d(MainActivity.TAG, "% - " + values[0]);
-        Log.d(MainActivity.TAG, "2 % - " + _progress.getProgress());
     }
 
     public void saveDataField(JsonReader reader, SQLiteDatabase db, String tableName) throws IOException {
@@ -155,6 +150,6 @@ public class DataFieldsAsync extends AsyncTask<Void, Integer, Void> {
         editor.putBoolean("isDb", true);
         editor.commit();
 
-        AddPartActivity.setSelectsField(_context);
+//        AddPartActivity.setSelectsField(_context);
     }
 }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.JsonReader;
 import android.util.JsonToken;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,7 +114,7 @@ public class AllPartsAsync extends AsyncTask<Void, Void, Void> {
                                     }else if(part_field.equals("category_id") && reader.peek() != JsonToken.NULL){
                                         part.setCategory_id(reader.nextInt());
                                     }else if(part_field.equals("car_model_id") && reader.peek() != JsonToken.NULL){
-                                        part.setUsed_car_id(reader.nextInt());
+                                        part.setCar_model_id(reader.nextInt());
                                     }else if(part_field.equals("location_id") && reader.peek() != JsonToken.NULL){
                                         part.setLocation_id(reader.nextInt());
                                     }else if(part_field.equals("supplier_id") && reader.peek() != JsonToken.NULL){
@@ -159,9 +158,7 @@ public class AllPartsAsync extends AsyncTask<Void, Void, Void> {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(_context, AddPartActivity.class);
-                intent.putExtra("part_id", _parts.get(i).get_id());
-
-                Log.d(MainActivity.TAG, " check ---- " + _parts.get(i).getPrice_buy());
+                intent.putExtra("Part", _parts.get(i));
 
                 _context.startActivity(intent);
             }

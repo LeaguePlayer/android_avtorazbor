@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -15,7 +14,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -67,17 +65,15 @@ public class SendPartAsync extends AsyncTask<Number, Void, Number> {
             nameValuePairs.add(new BasicNameValuePair("Part[comment]", activity._partsComment.getText().toString()));
 
             //selects
-            nameValuePairs.add(new BasicNameValuePair("Part[category_id]", activity._categoryId + ""));
-            nameValuePairs.add(new BasicNameValuePair("Part[car_model_id]", activity._carModelId + ""));
-            nameValuePairs.add(new BasicNameValuePair("Part[location_id]", activity._locationId + ""));
-            nameValuePairs.add(new BasicNameValuePair("Part[supplier_id]", activity._supplierId + ""));
-            nameValuePairs.add(new BasicNameValuePair("UsedCar", activity._buId + ""));
+            nameValuePairs.add(new BasicNameValuePair("Part[category_id]", (activity._categoryId != 0 ? activity._categoryId : "") + ""));
+            nameValuePairs.add(new BasicNameValuePair("Part[car_model_id]", (activity._carModelId != 0 ? activity._carModelId : "") + ""));
+            nameValuePairs.add(new BasicNameValuePair("Part[location_id]", (activity._locationId != 0 ? activity._locationId : "") + ""));
+            nameValuePairs.add(new BasicNameValuePair("Part[supplier_id]", (activity._supplierId != 0 ? activity._supplierId : "") + ""));
+            nameValuePairs.add(new BasicNameValuePair("UsedCar", (activity._buId != 0 ? activity._buId : "") + ""));
 
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             HttpResponse response = httpclient.execute(httppost);
-
-            Log.d(MainActivity.TAG, "response " +  EntityUtils.toString(response.getEntity()));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (ClientProtocolException e) {

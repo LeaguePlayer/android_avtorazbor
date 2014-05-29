@@ -1,9 +1,11 @@
 package ru.amobilestudio.razborapp.helpers;
 
+import java.io.Serializable;
+
 /**
  * Created by vetal on 27.05.14.
  */
-public class Part {
+public class Part implements Serializable{
     private int _id;
     private String _name;
     private String _date;

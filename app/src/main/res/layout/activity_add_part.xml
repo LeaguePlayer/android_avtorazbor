@@ -45,6 +45,27 @@
 
             <LinearLayout
                 android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/take_photo"
+                    android:id="@+id/take_photo" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/photos"
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp">
@@ -112,7 +133,6 @@
                     android:ems="10"
                     android:id="@+id/parts_comment"
                     android:lines="4"
-                    android:text="dsfasf"
                     android:gravity="left|top"
                     android:textSize="14sp"
                     android:textIsSelectable="true" />
@@ -137,12 +157,11 @@
                     android:text="@string/parts_category_id"
                     android:id="@+id/label_category_id" />
 
-                <ru.amobilestudio.razborapp.custom.MyAutoComplete
+
+                <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/parts_category_id"
-                    android:selectAllOnFocus="true"
-                    android:singleLine="false" />
+                    android:id="@+id/parts_category_id" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -165,12 +184,10 @@
                     android:text="@string/parts_car_model_id"
                     android:id="@+id/label_car_model_id" />
 
-                <ru.amobilestudio.razborapp.custom.MyAutoComplete
+                <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/parts_car_model_id"
-                    android:selectAllOnFocus="true"
-                    android:singleLine="false" />
+                    android:id="@+id/parts_car_model_id" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -194,12 +211,10 @@
                     android:text="@string/parts_location_id"
                     android:id="@+id/label_parts_location_id" />
 
-                <ru.amobilestudio.razborapp.custom.MyAutoComplete
+                <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/parts_location_id"
-                    android:selectAllOnFocus="true"
-                    android:singleLine="false" />
+                    android:id="@+id/parts_location_id" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -222,12 +237,10 @@
                     android:text="@string/parts_supplier_id"
                     android:id="@+id/label_parts_supplier_id" />
 
-                <ru.amobilestudio.razborapp.custom.MyAutoComplete
+                <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/parts_supplier_id"
-                    android:selectAllOnFocus="true"
-                    android:singleLine="false" />
+                    android:id="@+id/parts_supplier_id" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -250,12 +263,10 @@
                     android:text="@string/parts_bu"
                     android:id="@+id/label_parts_bu" />
 
-                <ru.amobilestudio.razborapp.custom.MyAutoComplete
+                <Spinner
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/parts_bu_id"
-                    android:selectAllOnFocus="true"
-                    android:singleLine="false" />
+                    android:id="@+id/parts_bu_id" />
 
                 <TextView
                     android:layout_width="wrap_content"

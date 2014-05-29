@@ -106,8 +106,8 @@ public class CreatePartAsync extends AsyncTask<Void, Void, Void> {
         if(_errors.isEmpty() && _id != null){
             AddPartActivity activity = (AddPartActivity) _context;
             TextView tv = (TextView) activity.findViewById(R.id.article_part);
-            String text = tv.getText().toString();
 
+            String text = tv.getText().toString();
             tv.setText(text + " " + _id.intValue());
 
             SharedPreferences settings = _context.getSharedPreferences(DataFieldsAsync.DB_PREFS, Context.MODE_PRIVATE);

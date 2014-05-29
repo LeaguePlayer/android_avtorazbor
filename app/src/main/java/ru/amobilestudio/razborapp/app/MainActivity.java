@@ -12,20 +12,22 @@ import android.widget.TextView;
 import ru.amobilestudio.razborapp.helpers.AllPartsAsync;
 import ru.amobilestudio.razborapp.helpers.Connection;
 import ru.amobilestudio.razborapp.helpers.DataFieldsAsync;
+import ru.amobilestudio.razborapp.helpers.DictionariesSQLiteHelper;
 
 
 public class MainActivity extends ListActivity {
 
     static final public boolean DEBUG_MODE = true;
-
     static final public String HOST = DEBUG_MODE ? "http://10.0.3.2:2000/" : "http://razbor.amobile2.tmweb.ru/";
-
     static final public String TAG = "razbor";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //logout user if he don't login
+        if(!LoginActivity.isLogin(this)) logOut();
 
         //check connection
         if(Connection.checkNetworkConnection(this)){
@@ -41,7 +43,7 @@ public class MainActivity extends ListActivity {
             }
         }
 
-        //TODO: delete this line
+        //TODO: delete this lines
         //------------------------------------------------------
         /*deleteDatabase(DictionariesSQLiteHelper.DATABASE_NAME);
         SharedPreferences settings = getSharedPreferences(DataFieldsAsync.DB_PREFS, Context.MODE_PRIVATE);
@@ -71,10 +73,20 @@ public class MainActivity extends ListActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_add_part) {
-            Intent intent = new Intent(this, AddPartActivity.class);
-            startActivity(intent);
+
+        switch (id){
+            case R.id.action_add_part:
+                Intent intent = new Intent(this, AddPartActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.action_update_bd:
+                updateDb();
+                break;
+            case R.id.action_logout:
+                logOut();
+                break;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -82,9 +94,42 @@ public class MainActivity extends ListActivity {
     protected void onResume() {
         super.onResume();
 
+        //logout user if he don't login
+        if(!LoginActivity.isLogin(this)) logOut();
+
         if(Connection.checkNetworkConnection(this)){
             AllPartsAsync allPartsAsync = new AllPartsAsync(this);
             allPartsAsync.execute();
         }
+    }
+
+    private void updateDb(){
+        deleteDatabase(DictionariesSQLiteHelper.DATABASE_NAME);
+        SharedPreferences settings = getSharedPreferences(DataFieldsAsync.DB_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putBoolean("isDb", false);
+        editor.commit();
+
+        if(Connection.checkNetworkConnection(this)){
+            DataFieldsAsync dataFieldsAsync = new DataFieldsAsync(this);
+            dataFieldsAsync.execute();
+        }
+    }
+
+    private void logOut(){
+        SharedPreferences settings = getSharedPreferences(LoginActivity.LOGIN_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+
+        editor.putInt("user_id", 0);
+        editor.putString("user_fio", "");
+        editor.putBoolean("isLogin", false);
+
+        editor.commit();
+
+        finish();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 }
