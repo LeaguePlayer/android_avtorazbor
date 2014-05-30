@@ -45,7 +45,7 @@ public class AllPartsAsync extends AsyncTask<Void, Void, Void> {
     public AllPartsAsync(Context context) {
         _context = context;
         _progress = new ProgressDialog(context);
-        _progress.setTitle(context.getString(R.string.send_message));
+        _progress.setTitle(context.getString(R.string.load_message));
         _progress.setMessage(context.getString(R.string.wait_title));
         _progress.setCancelable(true);
         _progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);

@@ -1,12 +1,16 @@
 package ru.amobilestudio.razborapp.app;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import ru.amobilestudio.razborapp.helpers.AllPartsAsync;
@@ -17,13 +21,15 @@ import ru.amobilestudio.razborapp.helpers.DictionariesSQLiteHelper;
 
 public class MainActivity extends ListActivity {
 
-    static final public boolean DEBUG_MODE = true;
+    static final public boolean DEBUG_MODE = false;
     static final public String HOST = DEBUG_MODE ? "http://10.0.3.2:2000/" : "http://razbor.amobile2.tmweb.ru/";
     static final public String TAG = "razbor";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        hideActionBar();
+
         setContentView(R.layout.activity_main);
 
         //logout user if he don't login
@@ -59,6 +65,20 @@ public class MainActivity extends ListActivity {
         helloText.setText(getString(R.string.hello_message) + user_info.getString("user_fio", "") + "\n" + getString(R.string.hello_message2));
     }
 
+    /* hide ActionBar */
+    public void hideActionBar(){
+        if (Build.VERSION.SDK_INT < 16) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }else{
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+
+            ActionBar actionBar = getActionBar();
+            actionBar.hide();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,6 +150,8 @@ public class MainActivity extends ListActivity {
         finish();
 
         Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 }

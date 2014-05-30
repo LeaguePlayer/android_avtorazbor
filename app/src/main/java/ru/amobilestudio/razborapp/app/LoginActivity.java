@@ -1,5 +1,6 @@
 package ru.amobilestudio.razborapp.app;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -14,6 +16,7 @@ import android.util.JsonReader;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -47,6 +50,8 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        hideActionBar();
 
         //check connection
         if(Connection.checkNetworkConnection(this)){
@@ -110,6 +115,21 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             case R.id.login_send:
                 checkLoginForm();
                 break;
+        }
+    }
+
+    /* hide ActionBar */
+    public void hideActionBar(){
+        if (Build.VERSION.SDK_INT < 16) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }else{
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+
+            ActionBar actionBar = getActionBar();
+            actionBar.hide();
         }
     }
 
@@ -215,25 +235,29 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
                         }
                         reader.endArray();
                     }else if (name.equals("data")) {
-                        reader.beginObject();
-                        while (reader.hasNext()){
-                            String dataName = reader.nextName();
-                            //get User Id
-                            if(dataName.equals("user")){
-                                reader.beginObject();
+                        reader.beginArray();
+                        while(reader.hasNext()){
+                            reader.beginObject();
+                            while (reader.hasNext()){
+                                String dataName = reader.nextName();
+                                //get User Id
+                                if(dataName.equals("user")){
+                                    reader.beginObject();
 
-                                while (reader.hasNext()){
-                                    String nUser = reader.nextName();
+                                    while (reader.hasNext()){
+                                        String nUser = reader.nextName();
 
-                                    if(nUser.equals("id")) user_id = reader.nextInt();
-                                    else if(nUser.equals("fio")) user_fio = reader.nextString();
-                                    else reader.skipValue();
+                                        if(nUser.equals("id")) user_id = reader.nextInt();
+                                        else if(nUser.equals("fio")) user_fio = reader.nextString();
+                                        else reader.skipValue();
+                                    }
+
+                                    reader.endObject();
                                 }
-
-                                reader.endObject();
                             }
+                            reader.endObject();
                         }
-                        reader.endObject();
+                        reader.endArray();
                     }else{
                         reader.skipValue();
                     }

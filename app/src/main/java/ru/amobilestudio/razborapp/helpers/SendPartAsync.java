@@ -71,7 +71,7 @@ public class SendPartAsync extends AsyncTask<Number, Void, Number> {
             nameValuePairs.add(new BasicNameValuePair("Part[supplier_id]", (activity._supplierId != 0 ? activity._supplierId : "") + ""));
             nameValuePairs.add(new BasicNameValuePair("UsedCar", (activity._buId != 0 ? activity._buId : "") + ""));
 
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 
             HttpResponse response = httpclient.execute(httppost);
         } catch (UnsupportedEncodingException e) {

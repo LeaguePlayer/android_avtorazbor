@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/login_name"
             android:layout_gravity="center_horizontal"
+            android:nextFocusDown="@+id/login_pass"
             android:hint="@string/login_name_field" />
 
         <EditText
