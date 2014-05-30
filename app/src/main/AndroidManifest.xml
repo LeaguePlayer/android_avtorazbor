@@ -20,6 +20,7 @@
         <activity
             android:name="ru.amobilestudio.razborapp.app.MainActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light"
             android:label="@string/app_name" >
         </activity>
         <activity

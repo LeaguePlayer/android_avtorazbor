@@ -5,13 +5,13 @@
     <item android:id="@+id/action_add_part"
         android:title="@string/action_add_part"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom|withText" />
     <item android:id="@+id/action_update_bd"
         android:title="@string/action_update_db"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom|withText" />
     <item android:id="@+id/action_logout"
         android:title="@string/action_logout"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom|withText" />
 </menu>
