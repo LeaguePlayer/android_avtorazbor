@@ -10,17 +10,17 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.File;
@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ru.amobilestudio.razborapp.custom.MyAutoComplete;
 import ru.amobilestudio.razborapp.helpers.Connection;
 import ru.amobilestudio.razborapp.helpers.CreatePartAsync;
 import ru.amobilestudio.razborapp.helpers.DataFieldsAsync;
@@ -48,11 +49,11 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
 //    public static MyAutoComplete _partsCategoryId;
-    public static Spinner _partsCategoryId;
-    public static Spinner _partsCarModelId;
-    public static Spinner _partsLocationId;
-    public static Spinner _partsSupplierId;
-    public static Spinner _partsBuId;
+    public static MyAutoComplete _partsCategoryId;
+    public static MyAutoComplete _partsCarModelId;
+    public static MyAutoComplete _partsLocationId;
+    public static MyAutoComplete _partsSupplierId;
+    public static MyAutoComplete _partsBuId;
 
     //for POST send
     public static int _categoryId;
@@ -63,6 +64,8 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
 
     private static Button _sendButton;
     private static Button _takePhoto;
+
+    /*private DictionariesSQLiteHelper _dictionariesSQLiteHelper;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,11 +79,91 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
         _partsPriceBuy = (EditText) findViewById(R.id.parts_price_buy);
         _partsComment = (EditText) findViewById(R.id.parts_comment);
 
-        _partsCategoryId = (Spinner) findViewById(R.id.parts_category_id);
-        _partsCarModelId = (Spinner) findViewById(R.id.parts_car_model_id);
-        _partsLocationId = (Spinner) findViewById(R.id.parts_location_id);
-        _partsSupplierId = (Spinner) findViewById(R.id.parts_supplier_id);
-        _partsBuId = (Spinner) findViewById(R.id.parts_bu_id);
+        /*------------Selects INIT--------------*/
+
+        final DictionariesSQLiteHelper dictionariesSQLiteHelper = new DictionariesSQLiteHelper(this);
+        //categories
+        ArrayList<DictionariesSQLiteHelper.Item> list = dictionariesSQLiteHelper.getAll(DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES, false);
+        ArrayAdapter<DictionariesSQLiteHelper.Item> adapter = new ArrayAdapter<DictionariesSQLiteHelper.Item>(this, android.R.layout.simple_dropdown_item_1line, list);
+        _partsCategoryId = (MyAutoComplete) findViewById(R.id.parts_category_id);
+        _partsCategoryId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int i, int i2, int i3) {}
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i2, int i3) {
+                _categoryId = dictionariesSQLiteHelper.getIdByValue(s.toString(), DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES);
+                Log.d(MainActivity.TAG, " category id = " + _categoryId);
+            }
+        });
+        _partsCategoryId.setAdapter(adapter);
+
+        //car models
+        list = dictionariesSQLiteHelper.getAll(DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS, false);
+        adapter = new ArrayAdapter<DictionariesSQLiteHelper.Item>(this, android.R.layout.simple_dropdown_item_1line, list);
+        _partsCarModelId = (MyAutoComplete) findViewById(R.id.parts_car_model_id);
+        _partsCarModelId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int i, int i2, int i3) {}
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i2, int i3) {
+                _carModelId = dictionariesSQLiteHelper.getIdByValue(s.toString(), DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS);
+            }
+        });
+        _partsCarModelId.setAdapter(adapter);
+
+        //locations
+        list = dictionariesSQLiteHelper.getAll(DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS, false);
+        adapter = new ArrayAdapter<DictionariesSQLiteHelper.Item>(this, android.R.layout.simple_dropdown_item_1line, list);
+        _partsLocationId = (MyAutoComplete) findViewById(R.id.parts_location_id);
+        _partsLocationId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int i, int i2, int i3) {}
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i2, int i3) {
+                _locationId = dictionariesSQLiteHelper.getIdByValue(s.toString(), DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS);
+            }
+        });
+        _partsLocationId.setAdapter(adapter);
+
+        //suppliers
+        list = dictionariesSQLiteHelper.getAll(DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS, false);
+        adapter = new ArrayAdapter<DictionariesSQLiteHelper.Item>(this, android.R.layout.simple_dropdown_item_1line, list);
+        _partsSupplierId = (MyAutoComplete) findViewById(R.id.parts_supplier_id);
+        _partsSupplierId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int i, int i2, int i3) {}
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i2, int i3) {
+                _supplierId = dictionariesSQLiteHelper.getIdByValue(s.toString(), DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS);
+            }
+        });
+        _partsSupplierId.setAdapter(adapter);
+
+        //bu
+        list = dictionariesSQLiteHelper.getAll(DictionariesSQLiteHelper.TABLE_NAME_BU_CARS, false);
+        adapter = new ArrayAdapter<DictionariesSQLiteHelper.Item>(this, android.R.layout.simple_dropdown_item_1line, list);
+        _partsBuId = (MyAutoComplete) findViewById(R.id.parts_bu_id);
+        _partsBuId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int i, int i2, int i3) {}
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i2, int i3) {
+                _buId = dictionariesSQLiteHelper.getIdByValue(s.toString(), DictionariesSQLiteHelper.TABLE_NAME_BU_CARS);
+            }
+        });
+        _partsBuId.setAdapter(adapter);
+
+        /*------------Selects end--------------*/
 
         _sendButton = (Button) findViewById(R.id.save_part_button);
         _sendButton.setOnClickListener(this);
@@ -88,7 +171,7 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
         _takePhoto = (Button) findViewById(R.id.take_photo);
         _takePhoto.setOnClickListener(this);
 
-        setSelectsField(this);
+        //setSelectsField(this);
 
         //when click on item ListView
         Bundle extras = getIntent().getExtras();
@@ -134,24 +217,40 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
 
         //selects
         final DictionariesSQLiteHelper dictionariesSQLiteHelper = new DictionariesSQLiteHelper(this);
-        int position = dictionariesSQLiteHelper.getPositionById(part.getCategory_id(), DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES);
-        _partsCategoryId.setSelection(position);
 
-        position = dictionariesSQLiteHelper.getPositionById(part.getCar_model_id(), DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS);
-        _partsCarModelId.setSelection(position);
+        String name = dictionariesSQLiteHelper.getValueById(part.getCategory_id(), DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES);
+        _partsCategoryId.setText(name);
 
-        position = dictionariesSQLiteHelper.getPositionById(part.getLocation_id(), DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS);
-        _partsLocationId.setSelection(position + 1);
+        name = dictionariesSQLiteHelper.getValueById(part.getCar_model_id(), DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS);
+        _partsCarModelId.setText(name);
 
-        position = dictionariesSQLiteHelper.getPositionById(part.getSupplier_id(), DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS);
+        name = dictionariesSQLiteHelper.getValueById(part.getLocation_id(), DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS);
+        _partsLocationId.setText(name);
+
+        name = dictionariesSQLiteHelper.getValueById(part.getSupplier_id(), DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS);
+        _partsSupplierId.setText(name);
+
+        name = dictionariesSQLiteHelper.getValueById(part.getUsed_car_id(), DictionariesSQLiteHelper.TABLE_NAME_BU_CARS);
+        _partsBuId.setText(name);
+
+        /*int position = dictionariesSQLiteHelper.getPositionById(part.getCategory_id(), DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES);*/
+        /*_partsCategoryId.setSelection(position);*/
+
+        /*position = dictionariesSQLiteHelper.getPositionById(part.getCar_model_id(), DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS);
+        _partsCarModelId.setSelection(position);*/
+
+        /*position = dictionariesSQLiteHelper.getPositionById(part.getLocation_id(), DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS);
+        _partsLocationId.setSelection(position + 1);*/
+
+        /*position = dictionariesSQLiteHelper.getPositionById(part.getSupplier_id(), DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS);
         _partsSupplierId.setSelection(position + 1);
 
         position = dictionariesSQLiteHelper.getPositionById(part.getUsed_car_id(), DictionariesSQLiteHelper.TABLE_NAME_BU_CARS);
-        _partsBuId.setSelection(position + 1);
+        _partsBuId.setSelection(position + 1);*/
     }
 
     public static void setSelectsField(final Context context){
-        DictionariesSQLiteHelper dsh = new DictionariesSQLiteHelper(context);
+        /*DictionariesSQLiteHelper dsh = new DictionariesSQLiteHelper(context);
 
         AdapterView.OnItemSelectedListener selectedListener = new AdapterView.OnItemSelectedListener() {
             @Override
@@ -183,13 +282,13 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
 
         //categories
         ArrayList<DictionariesSQLiteHelper.Item> list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES, false);
-        ItemAdapter adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
+        ItemAdapter adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);*/
 
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        /*adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _partsCategoryId.setAdapter(adapter);
-        _partsCategoryId.setOnItemSelectedListener(selectedListener);
+        _partsCategoryId.setOnItemSelectedListener(selectedListener);*/
 
-        //car models
+        /*//car models
         list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS, false);
         adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
 
@@ -203,9 +302,9 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _partsLocationId.setAdapter(adapter);
-        _partsLocationId.setOnItemSelectedListener(selectedListener);
+        _partsLocationId.setOnItemSelectedListener(selectedListener);*/
 
-        //suppliers
+        /*//suppliers
         list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS, true);
         adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
 
@@ -219,7 +318,7 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _partsBuId.setAdapter(adapter);
-        _partsBuId.setOnItemSelectedListener(selectedListener);
+        _partsBuId.setOnItemSelectedListener(selectedListener);*/
 
     }
 
@@ -341,7 +440,7 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
     }
 
 
-    public static class ItemAdapter extends ArrayAdapter<DictionariesSQLiteHelper.Item>{
+    /*public static class ItemAdapter extends ArrayAdapter<DictionariesSQLiteHelper.Item>{
 
         private ArrayList<DictionariesSQLiteHelper.Item> _items;
         private Context _context;
@@ -367,5 +466,5 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
             return _items.get(position).getId();
         }
 
-    }
+    }*/
 }

@@ -115,6 +115,15 @@ public class CreatePartAsync extends AsyncTask<Void, Void, Void> {
 
             editor.putInt("part_id", _id.intValue());
             editor.commit();
+
+            new AlertDialog.Builder(_context)
+                    .setTitle(_context.getString(R.string.alert_title))
+                    .setMessage(_context.getString(R.string.add_part_message))
+                    .setPositiveButton(R.string.confirm_text, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {}
+                    })
+                    .show();
         }else{
             new AlertDialog.Builder(_context)
                     .setTitle("Error")

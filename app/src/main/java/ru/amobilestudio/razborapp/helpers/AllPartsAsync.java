@@ -165,6 +165,10 @@ public class AllPartsAsync extends AsyncTask<Void, Void, Void> {
         });
 
         ListAdapter listAdapter = new ListAdapter(_context, R.layout.activity_main, _parts);
+
+        TextView emptyText = (TextView) activity.findViewById(R.id.empty_text);
+        listView.setEmptyView(emptyText);
+
         listView.setAdapter(listAdapter);
     }
 

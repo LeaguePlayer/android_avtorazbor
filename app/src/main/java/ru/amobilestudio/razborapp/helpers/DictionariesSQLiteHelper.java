@@ -114,6 +114,22 @@ public class DictionariesSQLiteHelper extends SQLiteOpenHelper {
         return position;
     }
 
+    public String getValueById(int id, String tableName){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor c = db.query(tableName, new String[]{COLUMN_NAME_VALUE}, COLUMN_ID_VALUE + "=?",
+                new String[]{id + ""}, null, null, null, null);
+
+        String result = "";
+
+        if(id == 0) return result;
+
+        if(c.moveToFirst())
+            result = c.getString(c.getColumnIndex(COLUMN_NAME_VALUE));
+
+        return result;
+    }
+
     public int getIdByValue(String name, String tableName){
         SQLiteDatabase db = this.getReadableDatabase();
 

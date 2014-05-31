@@ -27,6 +27,12 @@
     <string name="take_photo">Сделать фотографию</string>
     <string name="photo_load">Фотография загружется</string>
     <string name="photo_success">Фотография загружена</string>
+    <string name="unpublish_title">Не опубликованные запчасти</string>
+    <string name="empty_text_list">Список пуст</string>
+    <string name="alert_title">Сообщение</string>
+    <string name="add_part_message">Деталь добавлена в систему.</string>
+    <string name="validate_message_categor_and_car">Необходимо выбрать Категорию и Модель автомобиля.</string>
+    <string name="require_message">Поля обязательные для заполнения.</string>
 
     <!--parts fields-->
     <string name="parts_price_sell">Стоимость (на продажу)</string>

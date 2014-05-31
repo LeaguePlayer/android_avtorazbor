@@ -65,16 +65,51 @@
             </LinearLayout>
 
             <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:paddingTop="15dp"
+                android:paddingBottom="7dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="* "
+                    android:textColor="#ffff070a"
+                    android:id="@+id/message_color" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/require_message"
+                    android:id="@+id/required_text" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/parts_price_sell"
-                    android:id="@+id/label_parts_price_sell" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/parts_price_sell"
+                        android:id="@+id/label_parts_price_sell" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" *"
+                        android:textColor="#ffff070a"
+                        android:id="@+id/price_sell_color" />
+                </LinearLayout>
 
                 <EditText
                     android:inputType="number"
@@ -97,11 +132,24 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/parts_price_buy"
-                    android:id="@+id/label_parts_price_buy" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/parts_price_buy"
+                        android:id="@+id/label_parts_price_buy" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" *"
+                        android:textColor="#ffff070a"
+                        android:id="@+id/price_buy_color" />
+                </LinearLayout>
 
                 <EditText
                     android:inputType="number"
@@ -155,14 +203,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/parts_category_id"
-                    android:id="@+id/label_category_id" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/parts_category_id"
+                        android:id="@+id/label_category_id" />
 
-                <Spinner
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" *"
+                        android:textColor="#ffff070a"
+                        android:id="@+id/category_color" />
+                </LinearLayout>
+
+                <ru.amobilestudio.razborapp.custom.MyAutoComplete
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/parts_category_id" />
@@ -176,19 +236,33 @@
                     android:textColor="#ffff2d23"
                     android:visibility="gone" />
             </LinearLayout>
+
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/parts_car_model_id"
-                    android:id="@+id/label_car_model_id" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
 
-                <Spinner
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/parts_car_model_id"
+                        android:id="@+id/label_car_model_id" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" *"
+                        android:textColor="#ffff070a"
+                        android:id="@+id/car_model_color" />
+                </LinearLayout>
+
+                <ru.amobilestudio.razborapp.custom.MyAutoComplete
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/parts_car_model_id" />
@@ -215,7 +289,7 @@
                     android:text="@string/parts_location_id"
                     android:id="@+id/label_parts_location_id" />
 
-                <Spinner
+                <ru.amobilestudio.razborapp.custom.MyAutoComplete
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/parts_location_id" />
@@ -241,7 +315,7 @@
                     android:text="@string/parts_supplier_id"
                     android:id="@+id/label_parts_supplier_id" />
 
-                <Spinner
+                <ru.amobilestudio.razborapp.custom.MyAutoComplete
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/parts_supplier_id" />
@@ -267,7 +341,7 @@
                     android:text="@string/parts_bu"
                     android:id="@+id/label_parts_bu" />
 
-                <Spinner
+                <ru.amobilestudio.razborapp.custom.MyAutoComplete
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/parts_bu_id" />
