@@ -6,9 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.JsonReader;
-import android.util.Log;
 import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
@@ -37,13 +37,15 @@ import ru.amobilestudio.razborapp.app.R;
 /**
  * Created by vetal on 26.05.14.
  */
-public class SendPartAsync extends AsyncTask<Number, Void, Number> {
+public class SendPartAsync extends AsyncTask<Boolean, Void, Number> {
 
     private Context _context;
     private ProgressDialog _progress;
 
     private HashMap<String, String> _labels;
     private HashMap<String, String> _errors;
+
+    private int _id;
 
     public SendPartAsync(Context context) {
         _context = context;
@@ -76,14 +78,29 @@ public class SendPartAsync extends AsyncTask<Number, Void, Number> {
         super.onPreExecute();
 
         _progress.show();
+
+        SharedPreferences part_info = _context.getSharedPreferences(DataFieldsAsync.DB_PREFS, Context.MODE_PRIVATE);
+        _id = part_info.getInt("part_id", 0);
+
+        AddPartActivity activity = (AddPartActivity) _context;
+
+        Bundle extras = activity.getIntent().getExtras();
+        if(extras != null){
+            Part part = (Part) activity.getIntent().getSerializableExtra("Part");
+            _id = part.get_id();
+        }
     }
 
     @Override
-    protected Number doInBackground(Number... numbers) {
+    protected Number doInBackground(Boolean... booleans) {
+
+        Boolean publish = booleans[0];
+
+//        Log.d(MainActivity.TAG, " ID - " + _id);
 
         try {
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(MainActivity.HOST + "api/savePart/id/" + numbers[0]);
+            HttpPost httppost = new HttpPost(MainActivity.HOST + "api/savePart/id/" + _id);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
@@ -101,7 +118,8 @@ public class SendPartAsync extends AsyncTask<Number, Void, Number> {
             nameValuePairs.add(new BasicNameValuePair("Part[supplier_id]", (activity._supplierId != 0 ? activity._supplierId : "") + ""));
             nameValuePairs.add(new BasicNameValuePair("UsedCar", (activity._buId != 0 ? activity._buId : "") + ""));
 
-            Log.d(MainActivity.TAG, " data = " + nameValuePairs);
+            if(publish)
+                nameValuePairs.add(new BasicNameValuePair("Part[status]", "1"));
 
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 
@@ -197,7 +215,6 @@ public class SendPartAsync extends AsyncTask<Number, Void, Number> {
                 String key = entry.getKey();
 
                 if(_errors.containsKey(key)){
-                    Log.d(MainActivity.TAG, "key - " + key);
                     if(key.equals("name")){
                         errorsStr.append(_context.getString(R.string.validate_message_categor_and_car) + "\n");
                         continue;

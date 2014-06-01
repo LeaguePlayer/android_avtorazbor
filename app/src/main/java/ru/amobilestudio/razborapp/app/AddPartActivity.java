@@ -12,7 +12,6 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +47,6 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
-//    public static MyAutoComplete _partsCategoryId;
     public static MyAutoComplete _partsCategoryId;
     public static MyAutoComplete _partsCarModelId;
     public static MyAutoComplete _partsLocationId;
@@ -63,9 +61,8 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
     public static int _buId;
 
     private static Button _sendButton;
+    private static Button _publishButton;
     private static Button _takePhoto;
-
-    /*private DictionariesSQLiteHelper _dictionariesSQLiteHelper;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +91,6 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
             @Override
             public void onTextChanged(CharSequence s, int i, int i2, int i3) {
                 _categoryId = dictionariesSQLiteHelper.getIdByValue(s.toString(), DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES);
-                Log.d(MainActivity.TAG, " category id = " + _categoryId);
             }
         });
         _partsCategoryId.setAdapter(adapter);
@@ -168,6 +164,9 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
         _sendButton = (Button) findViewById(R.id.save_part_button);
         _sendButton.setOnClickListener(this);
 
+        _publishButton = (Button) findViewById(R.id.publish_part_button);
+        _publishButton.setOnClickListener(this);
+
         _takePhoto = (Button) findViewById(R.id.take_photo);
         _takePhoto.setOnClickListener(this);
 
@@ -232,96 +231,7 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
 
         name = dictionariesSQLiteHelper.getValueById(part.getUsed_car_id(), DictionariesSQLiteHelper.TABLE_NAME_BU_CARS);
         _partsBuId.setText(name);
-
-        /*int position = dictionariesSQLiteHelper.getPositionById(part.getCategory_id(), DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES);*/
-        /*_partsCategoryId.setSelection(position);*/
-
-        /*position = dictionariesSQLiteHelper.getPositionById(part.getCar_model_id(), DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS);
-        _partsCarModelId.setSelection(position);*/
-
-        /*position = dictionariesSQLiteHelper.getPositionById(part.getLocation_id(), DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS);
-        _partsLocationId.setSelection(position + 1);*/
-
-        /*position = dictionariesSQLiteHelper.getPositionById(part.getSupplier_id(), DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS);
-        _partsSupplierId.setSelection(position + 1);
-
-        position = dictionariesSQLiteHelper.getPositionById(part.getUsed_car_id(), DictionariesSQLiteHelper.TABLE_NAME_BU_CARS);
-        _partsBuId.setSelection(position + 1);*/
     }
-
-    public static void setSelectsField(final Context context){
-        /*DictionariesSQLiteHelper dsh = new DictionariesSQLiteHelper(context);
-
-        AdapterView.OnItemSelectedListener selectedListener = new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                DictionariesSQLiteHelper.Item item = (DictionariesSQLiteHelper.Item) adapterView.getItemAtPosition(i);
-                switch (adapterView.getId()){
-                    case R.id.parts_category_id:
-                        _categoryId = item.getId();
-                        break;
-                    case R.id.parts_car_model_id:
-                        _carModelId = item.getId();
-                        break;
-                    case R.id.parts_location_id:
-                        _locationId = item.getId();
-                        break;
-                    case R.id.parts_supplier_id:
-                        _supplierId = item.getId();
-                        break;
-                    case R.id.parts_bu_id:
-                        _buId = item.getId();
-                        break;
-                }
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {}
-        };
-
-        //categories
-        ArrayList<DictionariesSQLiteHelper.Item> list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_CATEGORIES, false);
-        ItemAdapter adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);*/
-
-        /*adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        _partsCategoryId.setAdapter(adapter);
-        _partsCategoryId.setOnItemSelectedListener(selectedListener);*/
-
-        /*//car models
-        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_CAR_MODELS, false);
-        adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        _partsCarModelId.setAdapter(adapter);
-        _partsCarModelId.setOnItemSelectedListener(selectedListener);
-
-        //locations
-        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_LOCATIONS, true);
-        adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        _partsLocationId.setAdapter(adapter);
-        _partsLocationId.setOnItemSelectedListener(selectedListener);*/
-
-        /*//suppliers
-        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_SUPPLIERS, true);
-        adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        _partsSupplierId.setAdapter(adapter);
-        _partsSupplierId.setOnItemSelectedListener(selectedListener);
-
-        //bu
-        list = dsh.getAll(DictionariesSQLiteHelper.TABLE_NAME_BU_CARS, true);
-        adapter = new ItemAdapter(context, android.R.layout.simple_spinner_item, list);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        _partsBuId.setAdapter(adapter);
-        _partsBuId.setOnItemSelectedListener(selectedListener);*/
-
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -348,7 +258,10 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
         switch (view.getId()){
 
             case R.id.save_part_button:
-                sendPart();
+                sendPart(false);
+                break;
+            case R.id.publish_part_button:
+                sendPart(true);
                 break;
             case R.id.take_photo:
                 takePhoto();
@@ -372,20 +285,11 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
         }
     }
 
-    private void sendPart(){
-        //get ID part
-        SharedPreferences part_info = getSharedPreferences(DataFieldsAsync.DB_PREFS, Context.MODE_PRIVATE);
-        int id = part_info.getInt("part_id", 0);
+    private void sendPart(boolean publish){
 
-        Bundle extras = getIntent().getExtras();
-        if(extras != null){
-            Part part = (Part) getIntent().getSerializableExtra("Part");
-            id = part.get_id();
-        }
-
-        if(id != 0 && Connection.checkNetworkConnection(this)){
+        if(Connection.checkNetworkConnection(this)){
             SendPartAsync sendTask = new SendPartAsync(this);
-            sendTask.execute(id);
+            sendTask.execute(publish);
         }
     }
 
@@ -428,7 +332,6 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Log.d(MainActivity.TAG, mCurrentPhotoPath + " photo ");
             File file = new File(mCurrentPhotoPath);
 
             if(file.exists() && Connection.checkNetworkConnection(this)){
@@ -438,33 +341,4 @@ public class AddPartActivity extends ActionBarActivity implements View.OnClickLi
 
         }
     }
-
-
-    /*public static class ItemAdapter extends ArrayAdapter<DictionariesSQLiteHelper.Item>{
-
-        private ArrayList<DictionariesSQLiteHelper.Item> _items;
-        private Context _context;
-
-        public ItemAdapter(Context context, int resource, ArrayList<DictionariesSQLiteHelper.Item> items) {
-            super(context, resource, items);
-            _items = items;
-            _context = context;
-        }
-
-        @Override
-        public int getCount() {
-            return _items.size();
-        }
-
-        @Override
-        public DictionariesSQLiteHelper.Item getItem(int position) {
-            return _items.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return _items.get(position).getId();
-        }
-
-    }*/
 }
